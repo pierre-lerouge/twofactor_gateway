@@ -28,19 +28,24 @@ use OCA\TwoFactorGateway\Exception\SmsTransmissionException;
 use OCA\TwoFactorGateway\PhoneNumberMask;
 use OCA\TwoFactorGateway\Service\Gateway\IGateway;
 use OCA\TwoFactorGateway\Service\StateStorage;
+use OCA\TwoFactorGateway\Provider\TwoFactorGatewayLoginProvider;
 use OCA\TwoFactorGateway\Settings\PersonalSettings;
+use OCP\AppFramework\IAppContainer;
 use OCP\Authentication\TwoFactorAuth\IDeactivatableByAdmin;
 use OCP\Authentication\TwoFactorAuth\IPersonalProviderSettings;
 use OCP\Authentication\TwoFactorAuth\IProvider;
 use OCP\Authentication\TwoFactorAuth\IProvidesIcons;
 use OCP\Authentication\TwoFactorAuth\IProvidesPersonalSettings;
+use OCP\Authentication\TwoFactorAuth\IActivatableAtLogin;
+use OCP\Authentication\TwoFactorAuth\ILoginSetupProvider;
+
 use OCP\IL10N;
 use OCP\ISession;
 use OCP\IUser;
 use OCP\Security\ISecureRandom;
 use OCP\Template;
 
-abstract class AProvider implements IProvider, IProvidesIcons, IDeactivatableByAdmin, IProvidesPersonalSettings {
+abstract class AProvider implements IProvider, IActivatableAtLogin, IProvidesIcons, IDeactivatableByAdmin, IProvidesPersonalSettings {
 	public const STATE_DISABLED = 0;
 	public const STATE_START_VERIFICATION = 1;
 	public const STATE_VERIFYING = 2;
@@ -64,6 +69,9 @@ abstract class AProvider implements IProvider, IProvidesIcons, IDeactivatableByA
 	/** @var IL10N */
 	protected $l10n;
 
+	/** @var IAppContainer */
+	private $container;
+
 	private function getSessionKey() {
 		return "twofactor_gateway_" . $this->gatewayName . "_secret";
 	}
@@ -73,13 +81,15 @@ abstract class AProvider implements IProvider, IProvidesIcons, IDeactivatableByA
 		StateStorage $stateStorage,
 		ISession $session,
 		ISecureRandom $secureRandom,
-		IL10N $l10n) {
+		IL10N $l10n,
+		IAppContainer $container) {
 		$this->gateway = $gateway;
 		$this->gatewayName = $gatewayId;
 		$this->stateStorage = $stateStorage;
 		$this->session = $session;
 		$this->secureRandom = $secureRandom;
 		$this->l10n = $l10n;
+		$this->container = $container;
 	}
 
 	/**
@@ -162,5 +172,14 @@ abstract class AProvider implements IProvider, IProvidesIcons, IDeactivatableByA
 		if ($state->getState() === self::STATE_ENABLED) {
 			$this->stateStorage->persist($state->disabled($user, $this->gatewayName));
 		}
+	}
+
+	/**
+	 * @param IUser $user
+	 *
+	 * @return ILoginSetupProvider
+	 */
+	public function getLoginSetup(IUser $user): ILoginSetupProvider {
+		return $this->container->query(TwoFactorGatewayLoginProvider::class);
 	}
 }

@@ -27,6 +27,7 @@ use OCA\TwoFactorGateway\Service\Gateway\Signal\Gateway;
 use OCA\TwoFactorGateway\Service\StateStorage;
 use OCP\IL10N;
 use OCP\ISession;
+use OCP\AppFramework\IAppContainer;
 use OCP\Security\ISecureRandom;
 
 class SignalProvider extends AProvider {
@@ -34,14 +35,16 @@ class SignalProvider extends AProvider {
 		StateStorage $stateStorage,
 		ISession $session,
 		ISecureRandom $secureRandom,
-		IL10N $l10n) {
+		IL10N $l10n,
+		IAppContainer $container) {
 		parent::__construct(
 			'signal',
 			$smsGateway,
 			$stateStorage,
 			$session,
 			$secureRandom,
-			$l10n
+			$l10n,
+			$container
 		);
 	}
 

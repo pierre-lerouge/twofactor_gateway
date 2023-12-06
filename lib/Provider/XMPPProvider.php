@@ -27,6 +27,7 @@ use OCA\TwoFactorGateway\Service\Gateway\XMPP\Gateway;
 use OCA\TwoFactorGateway\Service\StateStorage;
 use OCP\IL10N;
 use OCP\ISession;
+use OCP\AppFramework\IAppContainer;
 use OCP\Security\ISecureRandom;
 
 class XMPPProvider extends AProvider {
@@ -34,14 +35,16 @@ class XMPPProvider extends AProvider {
 		StateStorage $stateStorage,
 		ISession $session,
 		ISecureRandom $secureRandom,
-		IL10N $l10n) {
+		IL10N $l10n,
+		IAppContainer $container) {
 		parent::__construct(
 			'xmpp',
 			$smsGateway,
 			$stateStorage,
 			$session,
 			$secureRandom,
-			$l10n
+			$l10n,
+			$container
 		);
 	}
 

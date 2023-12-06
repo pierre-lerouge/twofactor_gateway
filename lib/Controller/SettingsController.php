@@ -27,13 +27,13 @@ namespace OCA\TwoFactorGateway\Controller;
 use OCA\TwoFactorGateway\Exception\VerificationException;
 use OCA\TwoFactorGateway\Service\Gateway\Factory as GatewayFactory;
 use OCA\TwoFactorGateway\Service\SetupService;
-use OCP\AppFramework\Controller;
+use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use OCP\IUserSession;
 
-class SettingsController extends Controller {
+class SettingsController extends ALoginSetupController {
 
 	/** @var IUserSession */
 	private $userSession;
